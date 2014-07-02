@@ -19,12 +19,14 @@ include_once dirname(__FILE__) . "/NotORM/Literal.php";
 include_once dirname(__FILE__) . "/NotORM/Result.php";
 include_once dirname(__FILE__) . "/NotORM/MultiResult.php";
 include_once dirname(__FILE__) . "/NotORM/Row.php";
+include_once dirname(__FILE__) . "/NotORM/Entity.php";
+include_once dirname(__FILE__) . "/NotORM/EntityMapper.php";
 
 
 
 // friend visibility emulation
 abstract class NotORM_Abstract {
-	protected $connection, $driver, $structure, $cache;
+	protected $connection, $driver, $structure, $cache, $entityMapper;
 	protected $notORM, $table, $primary, $rows, $referenced = array();
 	
 	protected $debug = false;
@@ -45,6 +47,7 @@ abstract class NotORM_Abstract {
 * @property-write string $rowClass = 'NotORM_Row' Class used for created objects
 * @property-write bool $jsonAsArray = false Use array instead of object in Result JSON serialization
 * @property-write string $transaction Assign 'BEGIN', 'COMMIT' or 'ROLLBACK' to start or stop transaction
+* @property-write bool $entityMapper enable or disable entity mapper
 */
 class NotORM extends NotORM_Abstract {
 	
@@ -53,7 +56,7 @@ class NotORM extends NotORM_Abstract {
 	* @param NotORM_Structure or null for new NotORM_Structure_Convention
 	* @param NotORM_Cache or null for no cache
 	*/
-	function __construct(PDO $connection, NotORM_Structure $structure = null, NotORM_Cache $cache = null) {
+	function __construct(PDO $connection, NotORM_Structure $structure = null, NotORM_Cache $cache = null, NotORM_Entity_Mapper $entityMapper = null) {
 		$this->connection = $connection;
 		$this->driver = $connection->getAttribute(PDO::ATTR_DRIVER_NAME);
 		if (!isset($structure)) {
@@ -61,6 +64,7 @@ class NotORM extends NotORM_Abstract {
 		}
 		$this->structure = $structure;
 		$this->cache = $cache;
+		$this->entityMapper = $entityMapper;
 	}
 	
 	/** Get table data to use as $db->table[1]
@@ -77,6 +81,9 @@ class NotORM extends NotORM_Abstract {
 	function __set($name, $value) {
 		if ($name == "debug" || $name == "freeze" || $name == "rowClass" || $name == "jsonAsArray") {
 			$this->$name = $value;
+		}
+		if ($name == 'entityMapper') {
+			$this->entityMapper->enable($value);
 		}
 		if ($name == "transaction") {
 			switch (strtoupper($value)) {
