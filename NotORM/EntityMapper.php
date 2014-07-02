@@ -63,7 +63,7 @@ class NotORM_Entity_Mapper_Convention implements NotORM_Entity_Mapper {
      * @return string
      */
     private function getEntityName($table) {
-        return preg_replace('/(?:^|_)(.?)/e',"strtoupper('$1')",$table);
+        return preg_replace_callback('/(?:^|_)(.?)/e', function($m) { strtoupper($m[1]); },$table);
     }
 
 }
