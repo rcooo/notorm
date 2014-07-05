@@ -35,7 +35,7 @@ class NotORM_Entity extends NotORM_Row {
      * @return string
      */
     private function getFunctionName($key) {
-        return preg_replace('/(?:^|_)(.?)/e',"strtoupper('$1')",$key);
+        return preg_replace_callback('/(?:^|_)(.?)/', function($m) { strtoupper($m[1]); },$key);
     }
 
 }
