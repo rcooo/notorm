@@ -5,15 +5,18 @@
 class NotORM_Row extends NotORM_Abstract implements IteratorAggregate, ArrayAccess, Countable, JsonSerializable {
 	private $modified = array();
 	protected $row, $result, $primary;
-	
-	/** @access protected must be public because it is called from Result */
-	function __construct(array $row, NotORM_Result $result) {
-		$this->row = $row;
-		$this->result = $result;
-		if (array_key_exists($result->primary, $row)) {
-			$this->primary = $row[$result->primary];
-		}
-	}
+
+    public function setRow(array $row) {
+        $this->row = $row;
+    }
+
+    public function setResult(NotORM_Result $result) {
+        $this->result =$result;
+
+        if (array_key_exists($result->primary, $this->row)) {
+            $this->primary = $this->row[$result->primary];
+        }
+    }
 	
 	/** Get primary key value
 	* @return string

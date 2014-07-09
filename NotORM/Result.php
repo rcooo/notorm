@@ -257,7 +257,10 @@ class NotORM_Result extends NotORM_Abstract implements Iterator, ArrayAccess, Co
 		if (isset($this->notORM->entityMapper)) {
 			$rowClass = $this->notORM->entityMapper->getEntity($this->table, $rowClass);
 		}
-		return new $rowClass($data, $this);
+        $row = new $rowClass();
+        $row->setRow($data);
+        $row->setResult($this);
+		return $row;
 	}
 
 	/** Update all rows in result set
@@ -657,7 +660,12 @@ class NotORM_Result extends NotORM_Abstract implements Iterator, ArrayAccess, Co
 					if (isset($this->notORM->entityMapper)) {
 						$rowClass = $this->notORM->entityMapper->getEntity($this->table, $rowClass);
 					}
-					$this->rows[$key] = new $rowClass($row, $this);
+
+                    $rowObject = new $rowClass();
+                    $rowObject->setRow($row);
+                    $rowObject->setResult($this);
+
+					$this->rows[$key] = $rowObject;
 				}
 			}
 			$this->data = $this->rows;
